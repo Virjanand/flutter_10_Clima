@@ -30,6 +30,14 @@ class _LoadingScreenState extends State<LoadingScreen> {
       var longitute = jsonDecode(data)['coord']['lon'];
       var latitude = jsonDecode(data)['coord']['lat'];
       var weatherDescription = jsonDecode(data)['weather'][0]['description'];
+
+      var temperature = jsonDecode(data)['main']['temp'];
+      var conditionNumber = jsonDecode(data)['weather'][0]['id'];
+      var city = jsonDecode(data)['name'];
+
+      print(temperature);
+      print(conditionNumber);
+      print(city);
     } else {
       print(response);
     }
