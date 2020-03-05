@@ -1,6 +1,7 @@
 import 'package:clima/services/location.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart';
+import 'dart:convert';
 
 class LoadingScreen extends StatefulWidget {
   @override
@@ -21,8 +22,22 @@ class _LoadingScreenState extends State<LoadingScreen> {
     print("longitude: " + location.longitude.toString());
   }
 
+  Future<void> getData() async {
+    var response = await get(
+        "https://samples.openweathermap.org/data/2.5/weather?lat=35&lon=139&appid=b6907d289e10d714a6e88b30761fae22");
+    if (response.statusCode == 200) {
+      String data = response.body;
+      var longitute = jsonDecode(data)['coord']['lon'];
+      var latitude = jsonDecode(data)['coord']['lat'];
+      var weatherDescription = jsonDecode(data)['weather'][0]['description'];
+    } else {
+      print(response);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    getData();
     return Scaffold();
   }
 }
