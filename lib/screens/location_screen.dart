@@ -12,9 +12,10 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
+  WeatherModel weatherModel = new WeatherModel();
   int temperature;
   String weatherIcon;
-  String temperatureMessage;
+  String weatherMessage;
   String cityName;
 
   @override
@@ -24,17 +25,24 @@ class _LocationScreenState extends State<LocationScreen> {
     updateUI(widget.locationWeather);
   }
 
-  void updateUI(locationWeather) {
-    WeatherModel weatherModel = new WeatherModel();
+  void updateUI(dynamic locationWeather) {
+    setState(() {
+      if (locationWeather == null) {
+        temperature = 0;
+        weatherIcon = 'Error';
+        weatherMessage = 'Unable to get weather data';
+        cityName = '';
+        return;
+      }
+      double temp = locationWeather['main']['temp'];
+      temperature = temp.toInt();
+      weatherMessage = weatherModel.getMessage(temperature);
 
-    double temp = locationWeather['main']['temp'];
-    temperature = temp.toInt();
-    temperatureMessage = weatherModel.getMessage(temperature);
+      var condition = locationWeather['weather'][0]['id'];
+      weatherIcon = weatherModel.getWeatherIcon(condition);
 
-    var condition = locationWeather['weather'][0]['id'];
-    weatherIcon = weatherModel.getWeatherIcon(condition);
-
-    cityName = locationWeather['name'];
+      cityName = locationWeather['name'];
+    });
   }
 
   @override
@@ -59,7 +67,10 @@ class _LocationScreenState extends State<LocationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   FlatButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      var weatherData = await weatherModel.getLocationWeather();
+                      updateUI(weatherData);
+                    },
                     child: Icon(
                       Icons.near_me,
                       size: 50.0,
@@ -92,7 +103,7 @@ class _LocationScreenState extends State<LocationScreen> {
               Padding(
                 padding: EdgeInsets.only(right: 15.0),
                 child: Text(
-                  temperatureMessage,
+                  '$weatherMessage in $cityName',
                   textAlign: TextAlign.right,
                   style: kMessageTextStyle,
                 ),
